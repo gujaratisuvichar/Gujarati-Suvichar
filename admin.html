@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gujarati Suvichar - Admin Panel</title>
+  <style>
+    body {
+      font-family: "Noto Sans Gujarati", sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box, .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+
+    .login-box h2, .panel h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+    }
+
+    button {
+      background: linear-gradient(45deg, #0078ff, #ff6600);
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      opacity: 0.9;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 15px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🔐 LOGIN BOX -->
+<div class="login-box" id="loginBox">
+  <h2>🔑 Admin Login</h2>
+  <input type="password" id="adminPass" placeholder="Enter Password">
+  <button onclick="checkPassword()">Login</button>
+  <p id="errorMsg" style="color:red;text-align:center;display:none;">❌ Incorrect password!</p>
+</div>
+
+<!-- 🧘‍♂️ ADMIN PANEL -->
+<div class="panel" id="adminPanel" style="display:none;">
+  <h2>Gujarati Suvichar Admin</h2>
+
+  <label>🖼️ Blogger Image Link:</label>
+  <input type="text" id="imageUrl" placeholder="Paste Blogger image URL here">
+
+  <label>💬 Gujarati Quote:</label>
+  <textarea id="quoteText" rows="3" placeholder="તમારો પ્રેરણાદાયક સુવિચાર લખો..."></textarea>
+
+  <label>🏷️ Category:</label>
+  <select id="category">
+    <option value="જીવન">જીવન</option>
+    <option value="સફળતા">સફળતા</option>
+    <option value="પ્રેમ">પ્રેમ</option>
+    <option value="પ્રેરણા">પ્રેરણા</option>
+    <option value="શાંતિ">શાંતિ</option>
+  </select>
+
+  <label>✍️ Author (Optional):</label>
+  <input type="text" id="author" placeholder="લેખકનું નામ (જો હોય તો)">
+
+  <button onclick="addSuvichar()">Add Suvichar</button>
+
+  <div class="success" id="successMsg">✅ Successfully Added!</div>
+
+  <div class="footer">© Gujarati Suvichar | gujaratigrowth25@gmail.com</div>
+</div>
+
+<script>
+  const PASSWORD = "yash772244";
+
+  function checkPassword() {
+    const pass = document.getElementById("adminPass").value.trim();
+    if (pass === PASSWORD) {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+    } else {
+      document.getElementById("errorMsg").style.display = "block";
+    }
+  }
+
+  // ✅ Add new Suvichar to localStorage
+  function addSuvichar() {
+    const imageUrl = document.getElementById("imageUrl").value.trim();
+    const quoteText = document.getElementById("quoteText").value.trim();
+    const category = document.getElementById("category").value;
+    const author = document.getElementById("author").value.trim();
+
+    if (!imageUrl || !quoteText) {
+      alert("⚠️ કૃપા કરીને ઈમેજ લિંક અને સુવિચાર બંને ઉમેરો.");
+      return;
+    }
+
+    const newItem = {
+      imageUrl,
+      quoteText,
+      category,
+      author,
+      date: new Date().toISOString()
+    };
+
+    let suvichars = JSON.parse(localStorage.getItem("suvichars")) || [];
+    suvichars.unshift(newItem);
+    localStorage.setItem("suvichars", JSON.stringify(suvichars));
+
+    document.getElementById("successMsg").style.display = "block";
+    setTimeout(() => {
+      document.getElementById("successMsg").style.display = "none";
+    }, 2000);
+
+    document.getElementById("imageUrl").value = "";
+    document.getElementById("quoteText").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("category").value = "જીવન";
+  }
+</script>
+
+</body>
+</html>
