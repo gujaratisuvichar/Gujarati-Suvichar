@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gujarati Suvichar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-light: #f9f9f9;
+      --bg-dark: #1e1e2f;
+      --card-light: #fff;
+      --card-dark: #2b2b3c;
+      --text-light: #222;
+      --text-dark: #eaeaea;
+      --accent1: #0078ff;
+      --accent2: #ff6600;
+    }
+
+    body {
+      font-family: "Noto Sans Gujarati", sans-serif;
+      margin: 0;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      background: linear-gradient(45deg, var(--accent1), var(--accent2));
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.6em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      background: var(--card-light);
+      padding: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+
+    .controls input, .controls select, .controls button {
+      padding: 8px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .controls button {
+      background: linear-gradient(45deg, var(--accent1), var(--accent2));
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .controls button:hover {
+      transform: scale(1.05);
+    }
+
+    .gallery {
+      column-count: 2;
+      column-gap: 15px;
+      padding: 15px;
+    }
+
+    @media (min-width: 700px) {
+      .gallery { column-count: 3; }
+    }
+
+    @media (min-width: 1000px) {
+      .gallery { column-count: 4; }
+    }
+
+    .card {
+      background: var(--card-light);
+      display: inline-block;
+      margin: 0 0 15px;
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      break-inside: avoid;
+    }
+
+    .card:hover { transform: translateY(-5px); }
+
+    .card img {
+      width: 100%;
+      border-bottom: 1px solid #eee;
+    }
+
+    .content {
+      padding: 10px;
+      text-align: center;
+    }
+
+    .quote {
+      font-size: 15px;
+      margin: 5px 0;
+    }
+
+    .meta {
+      color: gray;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+
+    .btn-group button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .download { background: #28a745; }
+    .whatsapp { background: #25d366; }
+
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background: var(--card-light);
+      color: gray;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .no-data {
+      text-align: center;
+      color: gray;
+      margin: 50px 0;
+    }
+
+    /* Dark mode */
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    body.dark .controls { background: var(--card-dark); }
+    body.dark .card { background: var(--card-dark); box-shadow: 0 2px 6px rgba(255,255,255,0.05); }
+    body.dark .footer { background: var(--card-dark); color: #ccc; }
+  </style>
+</head>
+<body>
+
+<header>🌄 Gujarati Suvichar</header>
+
+<div class="controls">
+  <input type="text" id="searchBox" placeholder="સુવિચાર શોધો...">
+  <select id="categoryFilter">
+    <option value="all">બધા</option>
+    <option value="જીવન">જીવન</option>
+    <option value="સફળતા">સફળતા</option>
+    <option value="પ્રેમ">પ્રેમ</option>
+    <option value="પ્રેરણા">પ્રેરણા</option>
+    <option value="શાંતિ">શાંતિ</option>
+  </select>
+  <button onclick="toggleTheme()">🌓 થીમ</button>
+  <button onclick="window.location.href='admin.html'">⚙️ એડમિન પેનલ</button>
+</div>
+
+<div class="gallery" id="gallery"></div>
+<div class="no-data" id="noData" style="display:none;">હાલમાં કોઈ સુવિચાર ઉપલબ્ધ નથી 😔</div>
+
+<div class="footer">© Gujarati Suvichar | gujaratigrowth25@gmail.com</div>
+
+<script>
+  let darkMode = false;
+
+  function toggleTheme() {
+    darkMode = !darkMode;
+    document.body.classList.toggle('dark', darkMode);
+  }
+
+  function loadSuvichars() {
+    const data = JSON.parse(localStorage.getItem("suvichars")) || [];
+    const search = document.getElementById("searchBox").value.trim().toLowerCase();
+    const category = document.getElementById("categoryFilter").value;
+    const gallery = document.getElementById("gallery");
+    const noData = document.getElementById("noData");
+
+    gallery.innerHTML = "";
+    let filtered = data.filter(item => {
+      const matchText = item.quoteText.toLowerCase().includes(search);
+      const matchCategory = category === "all" || item.category === category;
+      return matchText && matchCategory;
+    });
+
+    if (filtered.length === 0) {
+      noData.style.display = "block";
+      return;
+    } else {
+      noData.style.display = "none";
+    }
+
+    filtered.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${item.imageUrl}" alt="Gujarati Suvichar">
+        <div class="content">
+          <div class="quote">"${item.quoteText}"</div>
+          <div class="meta">${item.category}${item.author ? " • " + item.author : ""}</div>
+          <div class="btn-group">
+            <button class="download" onclick="downloadImage('${item.imageUrl}')">⬇️ Download</button>
+            <button class="whatsapp" onclick="shareWhatsApp('${item.quoteText}', '${item.imageUrl}')">📲 Share</button>
+          </div>
+        </div>
+      `;
+      gallery.appendChild(card);
+    });
+  }
+
+  function downloadImage(url) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Gujarati-Suvichar.jpg";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function shareWhatsApp(text, url) {
+    const msg = encodeURIComponent(`${text}\n${url}`);
+    window.open(`https://wa.me/?text=${msg}`, "_blank");
+  }
+
+  document.getElementById("searchBox").addEventListener("input", loadSuvichars);
+  document.getElementById("categoryFilter").addEventListener("change", loadSuvichars);
+
+  loadSuvichars();
+</script>
+
+</body>
+</html>
